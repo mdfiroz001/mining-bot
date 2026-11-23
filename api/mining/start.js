@@ -1,0 +1,2 @@
+import {context,handleError,json,method} from '../_lib/core.js';
+export default async function handler(req,res){if(!method(req,res,'POST'))return;try{const {db,profile}=await context(req);if(profile.account_status!=='active')return json(res,403,{error:'Activate your account before mining.'});const {data,error}=await db.rpc('start_mining_session',{p_profile_id:profile.id});if(error)throw error;return json(res,200,{session:data,message:'Mining session started.'})}catch(e){return handleError(res,e)}}

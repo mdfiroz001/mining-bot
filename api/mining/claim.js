@@ -1,0 +1,3 @@
+import {context,handleError,json,method} from '../_lib/core.js';import {z} from 'zod';
+const input=z.object({session_id:z.string().uuid()});
+export default async function handler(req,res){if(!method(req,res,'POST'))return;try{const {db,profile}=await context(req);const parsed=input.safeParse(req.body);if(!parsed.success)return json(res,400,{error:'A valid mining session ID is required.'});const {data,error}=await db.rpc('claim_mining_reward',{p_profile_id:profile.id,p_session_id:parsed.data.session_id});if(error)throw error;return json(res,200,{claim:data,message:`Reward credited: ${data?.amount||0} COIN`})}catch(e){return handleError(res,e)}}

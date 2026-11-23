@@ -1,0 +1,3 @@
+import {requireAdmin,handleError,json,method} from '../_lib/core.js';import {z} from 'zod';
+const bodySchema=z.object({submission_id:z.string().uuid(),decision:z.enum(['approved','rejected'])});
+export default async function handler(req,res){if(!method(req,res,'POST'))return;try{const {db,profile}=await requireAdmin(req);const parsed=bodySchema.safeParse(req.body);if(!parsed.success)return json(res,400,{error:'Invalid review details.'});const {data,error}=await db.rpc('review_task_submission',{p_submission_id:parsed.data.submission_id,p_admin_profile_id:profile.id,p_decision:parsed.data.decision});if(error)throw error;return json(res,200,{result:data,message:`Submission ${parsed.data.decision}.`})}catch(e){return handleError(res,e)}}

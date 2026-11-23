@@ -1,0 +1,2 @@
+import {requireAdmin,handleError,json,method} from '../_lib/core.js';
+export default async function handler(req,res){if(!method(req,res,'GET'))return;try{const {db}=await requireAdmin(req);const {data,error}=await db.from('task_submissions').select('id,status,proof,created_at,tasks(title,reward_amount),profiles(telegram_id,username)').eq('status','pending').order('created_at').limit(100);if(error)throw error;return json(res,200,{items:data||[]})}catch(e){return handleError(res,e)}}

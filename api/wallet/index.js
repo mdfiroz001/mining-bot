@@ -1,0 +1,2 @@
+import {context,handleError,json,method} from '../_lib/core.js';
+export default async function handler(req,res){if(!method(req,res,'GET'))return;try{const {db,profile}=await context(req);const {data,error}=await db.from('wallet_transactions').select('id,transaction_type,amount,description,created_at').eq('profile_id',profile.id).order('created_at',{ascending:false}).limit(100);if(error)throw error;return json(res,200,{transactions:data||[]})}catch(e){return handleError(res,e)}}
